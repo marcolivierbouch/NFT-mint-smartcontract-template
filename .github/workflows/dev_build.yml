@@ -31,6 +31,10 @@ jobs:
       - name: Install depedencies
         run: npm install
 
+      # Install depedencies
+      - name: Install depedencies
+        run: npm install -g truffle
+
       # Build frontend
       - name: Build and deploy contract
         run: truffle build #migrate --network rinkeby
