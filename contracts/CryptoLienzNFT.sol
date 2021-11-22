@@ -16,17 +16,17 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
     event MintNFT(address indexed _from, string url);
 
 
-    function mintNFT(address addr)
+    function mintNFT()
         public
         returns (uint256)
     {
         _tokenIds.increment();
 
         uint256 newItemId = _tokenIds.current();
-        _mint(, newItemId);
+        _mint(msg.sender, newItemId);
         string memory url = string(abi.encodePacked(uri, uint2str(newItemId), ".json"));
 
-        emit MintNFT(addr, url);
+        emit MintNFT(msg.sender, url);
 
         _setTokenURI(newItemId, url);
 
