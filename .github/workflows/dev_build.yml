@@ -30,10 +30,14 @@ jobs:
       # Install depedencies
       - name: Install depedencies
         run: npm install
+      
+      # Install depedencies
+      - name: Install truffle
+        run: npm install -g truffle
 
       # Build frontend
       - name: Build and deploy contract
-        run: truffle build #migrate --network rinkeby
+        run: truffle migrate --network rinkeby
         env:
           WALLET_SECRET_KEY: ${{ secrets.WALLET_SECRET_KEY }}
           ARB_PROVIDER_RINKEBY: ${{ secrets.ARB_PROVIDER_RINKEBY }}
