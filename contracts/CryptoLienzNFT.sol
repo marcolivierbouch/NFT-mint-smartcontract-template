@@ -15,7 +15,6 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
     constructor() ERC721("CryptoLienzNFT", "CLNFT") {}
     event MintNFT(address indexed _from, string url);
 
-
     function mintNFT()
         public
         returns (uint256)
@@ -24,7 +23,7 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
 
         uint256 newItemId = _tokenIds.current();
         _mint(msg.sender, newItemId);
-        string memory url = string(abi.encodePacked(uri, uint2str(newItemId), ".json"));
+        string memory url = string(abi.encodePacked(uri, uint2str(newItemId)));
 
         emit MintNFT(msg.sender, url);
 
@@ -32,6 +31,13 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
 
         return newItemId;
     }
+        
+
+    function baseTokenURI() public view returns (string memory) {
+      return uri;
+    }
+
+
 
     function uint2str(uint256 _i) internal pure returns (string memory str) {
         if (_i == 0) {
