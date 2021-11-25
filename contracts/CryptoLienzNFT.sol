@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract CryptoLienzNFT is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
-    string private uri = "https://gateway.pinata.cloud/ipfs/QmdBiZ7CNFy4M7rAWRv612RbknyAMLdgys1xng27KDneSA/";
+    string private uri = "https://gateway.pinata.cloud/ipfs/QmRaXNwzfmqSN3RXWxkHjAJ35DNYkUnFKX8E6iEGR6m167";
 
     constructor() ERC721("CryptoLienzNFT", "CLNFT") {}
     event MintNFT(address indexed _from, string url);
