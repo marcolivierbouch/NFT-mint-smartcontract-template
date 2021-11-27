@@ -10,34 +10,64 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract CryptoLienzNFT is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
-    string private uri = "https://gateway.pinata.cloud/ipfs/QmQNNdJnaQjGiL6pHXnyeGVxTwZNpipzgW87zVwLp8CL6i/";
 
-    constructor() ERC721("CryptoLienzNFT", "CLNFT") {}
-    event MintNFT(address indexed _from, string url);
+    address payable public minter;
+    uint256 public maxBatch = 5;
+    uint256 public totalCount = 200;
+    uint256 public price = 60000000000000000; // 0.04 eth
 
-    function mintNFT()
-        public
-        returns (uint256)
-    {
-        _tokenIds.increment();
+    bool private started = false;
 
-        uint256 newItemId = _tokenIds.current();
-        _mint(msg.sender, newItemId);
-        string memory url = string(abi.encodePacked(uri, uint2str(newItemId)));
 
-        emit MintNFT(msg.sender, url);
+    event MintNFT(address indexed _from, string url, uint256 times);
+    // https://gateway.pinata.cloud/ipfs/QmQNNdJnaQjGiL6pHXnyeGVxTwZNpipzgW87zVwLp8CL6i/
 
-        _setTokenURI(newItemId, url);
+    string private _uri = "";
 
-        return newItemId;
+    modifier restricted() {
+      if (msg.sender == minter) _;
+    }
+
+    constructor() ERC721("CryptoLienzNFT", "CLNFT") {
+      minter = payable(msg.sender);
+    }
+
+    function mintNFT(uint256 _times) public payable {
+        require(started, "not started");
+        require(_times > 0 && _times <= maxBatch, "Wrong batch number");
+        require(_tokenIds.current() + _times <= totalCount, "Not enough toad left");
+        require(msg.value == _times * price, "Not the good price");
+
+        for(uint256 i=0; i< _times; i++){
+            _tokenIds.increment();
+
+            uint256 newItemId = _tokenIds.current();
+            _mint(msg.sender, newItemId);
+            string memory url = string(abi.encodePacked(_uri, uint2str(newItemId)));
+
+            emit MintNFT(msg.sender, url, _times);
+
+            _setTokenURI(newItemId, url);
+
+            payable(msg.sender).transfer(msg.value);
+        }
+    }
+
+    function totalSupply() public view virtual returns (uint256) {
+        return _tokenIds.current();
     }
         
-
-    function baseTokenURI() public view returns (string memory) {
-      return uri;
+    function setStart(bool _start) public onlyOwner {
+        started = _start;
     }
 
+    function baseTokenURI() public view returns (string memory) {
+        return _uri;
+    }
 
+    function setBaseTokenURI(string memory _baseURI) public restricted {
+        _uri = _baseURI;
+    }
 
     function uint2str(uint256 _i) internal pure returns (string memory str) {
         if (_i == 0) {
