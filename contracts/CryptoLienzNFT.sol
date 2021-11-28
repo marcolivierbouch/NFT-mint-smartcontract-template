@@ -16,7 +16,7 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
     uint256 public totalCount = 200;
     uint256 public price = 60000000000000000; // 0.04 eth
 
-    bool private started = false;
+    bool public started = false;
 
 
     event MintNFT(address indexed _from, string url, uint256 times);
@@ -57,7 +57,7 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
         return _tokenIds.current();
     }
         
-    function setStart(bool _start) public onlyOwner {
+    function setStart(bool _start) public restricted {
         started = _start;
     }
 
