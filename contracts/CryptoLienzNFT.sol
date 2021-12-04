@@ -18,9 +18,7 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
 
     bool public started = false;
 
-
     event MintNFT(address indexed _from, string url, uint256 times);
-    // https://gateway.pinata.cloud/ipfs/QmQNNdJnaQjGiL6pHXnyeGVxTwZNpipzgW87zVwLp8CL6i/
 
     string private _uri = "";
 
@@ -35,10 +33,10 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
     function mintNFT(uint256 _times) public payable {
         require(started, "not started");
         require(_times > 0 && _times <= maxBatch, "Wrong batch number");
-        require(_tokenIds.current() + _times <= totalCount, "Not enough toad left");
+        require(_tokenIds.current() + _times <= totalCount, "Not enough item left");
         require(msg.value == _times * price, "Not the good price");
 
-        for(uint256 i=0; i< _times; i++){
+        for(uint256 i = 0; i < _times; i++){
             _tokenIds.increment();
 
             uint256 newItemId = _tokenIds.current();
@@ -90,7 +88,3 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
         return str;
     }
 }
-
-// const contract = await CryptoLienzNFT.deployed();
-
-// contract.awardItem("0x63126293FA2E90d87aCF90A79134A2761943136b", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Ethereum_logo_2014.svg/256px-Ethereum_logo_2014.svg.png")
