@@ -40,7 +40,7 @@ module.exports = {
       provider: function () {
           return new HDWalletProvider(process.env.WALLET_SECRET_KEY, process.env.ARB_PROVIDER_RINKEBY, 0)
       },
-      network_id: '*',
+      network_id: '4',
       gas: 4500000,
       gasPrice: 10000000000,
     },

@@ -10,27 +10,62 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract CryptoLienzNFT is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
-    string private uri = "https://gateway.pinata.cloud/ipfs/QmdBiZ7CNFy4M7rAWRv612RbknyAMLdgys1xng27KDneSA/";
 
-    constructor() ERC721("CryptoLienzNFT", "CLNFT") {}
-    event MintNFT(address indexed _from, string url);
+    address payable public minter;
+    uint256 public maxBatch = 5;
+    uint256 public totalCount = 200;
+    uint256 public price = 60000000000000000; // 0.04 eth
 
+    bool public started = false;
 
-    function mintNFT()
-        public
-        returns (uint256)
-    {
-        _tokenIds.increment();
+    event MintNFT(address indexed _from, string url, uint256 times);
 
-        uint256 newItemId = _tokenIds.current();
-        _mint(msg.sender, newItemId);
-        string memory url = string(abi.encodePacked(uri, uint2str(newItemId), ".json"));
+    string private _uri = "";
 
-        emit MintNFT(msg.sender, url);
+    modifier restricted() {
+      require(msg.sender == minter);
+      _;
+    }
 
-        _setTokenURI(newItemId, url);
+    constructor() ERC721("CryptoLienzNFT", "CLNFT") {
+      minter = payable(msg.sender);
+    }
 
-        return newItemId;
+    function mintNFT(uint256 _times) public payable {
+        require(started, "not started");
+        require(_times > 0 && _times <= maxBatch, "Wrong batch number");
+        require(_tokenIds.current() + _times <= totalCount, "Not enough item left");
+        require(msg.value == _times * price, "Not the good price");
+
+        for(uint256 i = 0; i < _times; i++){
+            _tokenIds.increment();
+
+            uint256 newItemId = _tokenIds.current();
+            _mint(msg.sender, newItemId);
+            string memory url = string(abi.encodePacked(_uri, uint2str(newItemId)));
+
+            emit MintNFT(msg.sender, url, _times);
+
+            _setTokenURI(newItemId, url);
+
+            payable(msg.sender).transfer(msg.value);
+        }
+    }
+
+    function totalSupply() public view virtual returns (uint256) {
+        return _tokenIds.current();
+    }
+        
+    function setStart(bool _start) public restricted {
+        started = _start;
+    }
+
+    function baseTokenURI() public view returns (string memory) {
+        return _uri;
+    }
+
+    function setBaseTokenURI(string memory _baseURI) public restricted {
+        _uri = _baseURI;
     }
 
     function uint2str(uint256 _i) internal pure returns (string memory str) {
@@ -54,7 +89,3 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
         return str;
     }
 }
-
-// const contract = await CryptoLienzNFT.deployed();
-
-// contract.awardItem("0x63126293FA2E90d87aCF90A79134A2761943136b", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Ethereum_logo_2014.svg/256px-Ethereum_logo_2014.svg.png")
