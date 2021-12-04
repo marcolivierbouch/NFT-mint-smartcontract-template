@@ -23,7 +23,8 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
     string private _uri = "";
 
     modifier restricted() {
-      if (msg.sender == minter) _;
+      require(msg.sender == minter);
+      _;
     }
 
     constructor() ERC721("CryptoLienzNFT", "CLNFT") {
