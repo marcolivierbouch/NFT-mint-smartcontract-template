@@ -13,8 +13,11 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
 
     address payable public minter;
     uint256 public maxBatch = 5;
+    uint256 public maxMintcount = 5;
     uint256 public totalCount = 200;
-    uint256 public price = 60000000000000000; // 0.04 eth
+    uint256 public price = 60000000000000000; // 0.06 eth
+
+    mapping(address => bool) public mintlist;
 
     bool public started = false;
 
@@ -23,7 +26,7 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
     string private _uri = "";
 
     modifier restricted() {
-      require(msg.sender == minter);
+      require(msg.sender == minter, "Must be the owner to call this function");
       _;
     }
 
@@ -36,6 +39,9 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
         require(_times > 0 && _times <= maxBatch, "Wrong batch number");
         require(_tokenIds.current() + _times <= totalCount, "Not enough item left");
         require(msg.value == _times * price, "Not the good price");
+        require(mintlist[msg.sender] != true, "You've already minted a Cryptolienz! Don't be greedy!");
+        
+        mintlist[msg.sender] = true;
 
         for(uint256 i = 0; i < _times; i++){
             _tokenIds.increment();
@@ -47,13 +53,15 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
             emit MintNFT(msg.sender, url, _times);
 
             _setTokenURI(newItemId, url);
-
-            payable(msg.sender).transfer(msg.value);
         }
     }
 
     function totalSupply() public view virtual returns (uint256) {
         return _tokenIds.current();
+    }
+
+    function withdraw(address payable _wallet) public payable restricted {
+        payable(_wallet).transfer(address(this).balance);
     }
         
     function setStart(bool _start) public restricted {
