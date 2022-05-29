@@ -1,6 +1,11 @@
 # smartcontract
 
 
+How to build
+```
+truffle build
+```
+
 
 Truffle console commands:
 
