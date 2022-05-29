@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.6;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 
-contract CryptoLienzNFT is ERC721URIStorage, Ownable {
+contract CryptoLienzNFT is ERC721Enumerable, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -21,7 +21,7 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
 
     bool public started = false;
 
-    event MintNFT(address indexed _from, string url, uint256 times);
+    event MintNFT(address indexed _from, uint256 id);
 
     string private _uri = "";
 
@@ -48,16 +48,9 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
 
             uint256 newItemId = _tokenIds.current();
             _mint(msg.sender, newItemId);
-            string memory url = string(abi.encodePacked(_uri, uint2str(newItemId)));
 
-            emit MintNFT(msg.sender, url, _times);
-
-            _setTokenURI(newItemId, url);
+            emit MintNFT(msg.sender, newItemId);
         }
-    }
-
-    function totalSupply() public view virtual returns (uint256) {
-        return _tokenIds.current();
     }
 
     function withdraw(address payable _wallet) public payable restricted {
