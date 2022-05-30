@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-
 contract CryptoLienzNFT is ERC721Enumerable, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
@@ -54,7 +53,7 @@ contract CryptoLienzNFT is ERC721Enumerable, Ownable {
     }
 
     function tokenURI(uint256 _tokenId) public view override returns (string memory) {
-      return string.concat(baseTokenURI(), uint2str(_tokenId));
+      return string(abi.encodePacked(baseTokenURI(), uint2str(_tokenId)));
     }
 
     function withdraw(address payable _wallet) public payable restricted {
