@@ -53,6 +53,10 @@ contract CryptoLienzNFT is ERC721Enumerable, Ownable {
         }
     }
 
+    function tokenURI(uint256 _tokenId) public view override returns (string memory) {
+      return string.concat(baseTokenURI(), uint2str(_tokenId));
+    }
+
     function withdraw(address payable _wallet) public payable restricted {
         payable(_wallet).transfer(address(this).balance);
     }
