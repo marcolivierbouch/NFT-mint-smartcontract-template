@@ -43,7 +43,7 @@ contract CryptoLienzNFT is ERC721Enumerable, Ownable {
         require(msg.value == _times * price, "Not the good price");
         require(mintlist[msg.sender] != true, "You've already minted a Cryptolienz! Don't be greedy!");
 
-        if (mintPhase == 1) { // Whitelist mint
+        if (mintPhase == 1) { // allowed list mint
           require(allowList[msg.sender], "You must be in the allowed list to mint right now!");
         }
         
