@@ -22,8 +22,8 @@ contract CryptoLienzNFT is ERC721Enumerable, Ownable {
     uint256 mintPhase = 0; //Mint phase 0 is for not started; Mint phase 1 is for allowlist; Mint phase 2 is for public mint
 
     bool private reveal = false;
-    string private _uri = "";
-    string private _preRevealURI = "";
+    string private uri = "";
+    string private preRevealURI = "";
 
     event MintNFT(address indexed _from, uint256 id);
 
@@ -82,13 +82,17 @@ contract CryptoLienzNFT is ERC721Enumerable, Ownable {
         
     function baseTokenURI() public view returns (string memory) {
         if (!reveal) {
-          return _preRevealURI;
+          return preRevealURI;
         }
-        return _uri;
+        return uri;
+    }
+
+    function setPreRevealTokenURI(string memory _tokenURI) public restricted {
+        preRevealURI  = _tokenURI;
     }
 
     function setBaseTokenURI(string memory _baseURI) public restricted {
-        _uri = _baseURI;
+        uri = _baseURI;
     }
 
     function uint2str(uint256 _i) internal pure returns (string memory str) {
