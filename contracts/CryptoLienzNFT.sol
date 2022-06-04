@@ -16,13 +16,16 @@ contract CryptoLienzNFT is ERC721Enumerable, Ownable {
     uint256 public totalCount = 200;
     uint256 public price = 60000000000000000; // 0.06 eth
 
+    mapping (address => bool) public allowList;
     mapping(address => bool) public mintlist;
 
-    bool public started = false;
+    uint256 mintPhase = 0; //Mint phase 0 is for not started; Mint phase 1 is for allowlist; Mint phase 2 is for public mint
+
+    bool private reveal = false;
+    string private _uri = "";
+    string private _preRevealURI = "";
 
     event MintNFT(address indexed _from, uint256 id);
-
-    string private _uri = "";
 
     modifier restricted() {
       require(msg.sender == minter, "Must be the owner to call this function");
@@ -34,11 +37,15 @@ contract CryptoLienzNFT is ERC721Enumerable, Ownable {
     }
 
     function mintNFT(uint256 _times) public payable {
-        require(started, "not started");
+        require(mintPhase > 0, "not started");
         require(_times > 0 && _times <= maxBatch, "Wrong batch number");
         require(_tokenIds.current() + _times <= totalCount, "Not enough item left");
         require(msg.value == _times * price, "Not the good price");
         require(mintlist[msg.sender] != true, "You've already minted a Cryptolienz! Don't be greedy!");
+
+        if (mintPhase == 1) { // Whitelist mint
+          require(allowList[msg.sender], "You must be in the allowed list to mint right now!");
+        }
         
         mintlist[msg.sender] = true;
 
@@ -52,7 +59,20 @@ contract CryptoLienzNFT is ERC721Enumerable, Ownable {
         }
     }
 
+    function setAllowList(address[] calldata _addresses) external restricted {
+      for (uint256 i = 0; i < _addresses.length; i++) {
+          allowList[_addresses[i]] = true;
+      }
+    }
+
+    function setMintPhase(uint256 _mintPhase) public restricted {
+      mintPhase = _mintPhase;
+    }
+
     function tokenURI(uint256 _tokenId) public view override returns (string memory) {
+      if (!reveal) {
+        return baseTokenURI();
+      }
       return string(abi.encodePacked(baseTokenURI(), uint2str(_tokenId)));
     }
 
@@ -60,11 +80,10 @@ contract CryptoLienzNFT is ERC721Enumerable, Ownable {
         payable(_wallet).transfer(address(this).balance);
     }
         
-    function setStart(bool _start) public restricted {
-        started = _start;
-    }
-
     function baseTokenURI() public view returns (string memory) {
+        if (!reveal) {
+          return _preRevealURI;
+        }
         return _uri;
     }
 
