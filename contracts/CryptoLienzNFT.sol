@@ -91,6 +91,10 @@ contract CryptoLienzNFT is ERC721Enumerable, Ownable {
         preRevealURI  = _tokenURI;
     }
 
+    function setReveal(bool _reveal) public restricted {
+        reveal = _reveal;
+    }
+
     function setBaseTokenURI(string memory _baseURI) public restricted {
         uri = _baseURI;
     }
