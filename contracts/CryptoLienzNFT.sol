@@ -14,7 +14,7 @@ contract CryptoLienzNFT is ERC721Enumerable, Ownable {
     uint256 public maxBatch = 5;
     uint256 public maxMintcount = 5;
     uint256 public totalCount = 200;
-    uint256 public price = 60000000000000000; // 0.06 eth
+    uint256 public price = 0.06 ether; //60000000000000000; // 0.06 eth
 
     mapping (address => bool) public allowList;
     mapping(address => bool) public mintlist;
@@ -70,8 +70,8 @@ contract CryptoLienzNFT is ERC721Enumerable, Ownable {
     }
 
     function tokenURI(uint256 _tokenId) public view override returns (string memory) {
-      if (!reveal) {
-        return baseTokenURI();
+      if (reveal == false) {
+        return preRevealURI;
       }
       return string(abi.encodePacked(baseTokenURI(), uint2str(_tokenId)));
     }
@@ -81,9 +81,6 @@ contract CryptoLienzNFT is ERC721Enumerable, Ownable {
     }
         
     function baseTokenURI() public view returns (string memory) {
-        if (!reveal) {
-          return preRevealURI;
-        }
         return uri;
     }
 
