@@ -2,12 +2,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.6;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-
-contract CryptoLienzNFT is ERC721URIStorage, Ownable {
+contract CryptoLienzNFT is ERC721Enumerable, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -15,15 +14,18 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
     uint256 public maxBatch = 5;
     uint256 public maxMintcount = 5;
     uint256 public totalCount = 200;
-    uint256 public price = 60000000000000000; // 0.06 eth
+    uint256 public price = 0.06 ether; //60000000000000000; // 0.06 eth
 
+    mapping (address => bool) public allowList;
     mapping(address => bool) public mintlist;
 
-    bool public started = false;
+    uint256 mintPhase = 0; //Mint phase 0 is for not started; Mint phase 1 is for allowlist; Mint phase 2 is for public mint
 
-    event MintNFT(address indexed _from, string url, uint256 times);
+    bool private reveal = false;
+    string private uri = "";
+    string private preRevealURI = "";
 
-    string private _uri = "";
+    event MintNFT(address indexed _from, uint256 id);
 
     modifier restricted() {
       require(msg.sender == minter, "Must be the owner to call this function");
@@ -35,11 +37,15 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
     }
 
     function mintNFT(uint256 _times) public payable {
-        require(started, "not started");
+        require(mintPhase > 0, "not started");
         require(_times > 0 && _times <= maxBatch, "Wrong batch number");
         require(_tokenIds.current() + _times <= totalCount, "Not enough item left");
         require(msg.value == _times * price, "Not the good price");
         require(mintlist[msg.sender] != true, "You've already minted a Cryptolienz! Don't be greedy!");
+
+        if (mintPhase == 1) { // allowed list mint
+          require(allowList[msg.sender], "You must be in the allowed list to mint right now!");
+        }
         
         mintlist[msg.sender] = true;
 
@@ -48,32 +54,46 @@ contract CryptoLienzNFT is ERC721URIStorage, Ownable {
 
             uint256 newItemId = _tokenIds.current();
             _mint(msg.sender, newItemId);
-            string memory url = string(abi.encodePacked(_uri, uint2str(newItemId)));
 
-            emit MintNFT(msg.sender, url, _times);
-
-            _setTokenURI(newItemId, url);
+            emit MintNFT(msg.sender, newItemId);
         }
     }
 
-    function totalSupply() public view virtual returns (uint256) {
-        return _tokenIds.current();
+    function setAllowList(address[] calldata _addresses) external restricted {
+      for (uint256 i = 0; i < _addresses.length; i++) {
+          allowList[_addresses[i]] = true;
+      }
+    }
+
+    function setMintPhase(uint256 _mintPhase) public restricted {
+      mintPhase = _mintPhase;
+    }
+
+    function tokenURI(uint256 _tokenId) public view override returns (string memory) {
+      if (reveal == false) {
+        return preRevealURI;
+      }
+      return string(abi.encodePacked(baseTokenURI(), uint2str(_tokenId)));
     }
 
     function withdraw(address payable _wallet) public payable restricted {
         payable(_wallet).transfer(address(this).balance);
     }
         
-    function setStart(bool _start) public restricted {
-        started = _start;
+    function baseTokenURI() public view returns (string memory) {
+        return uri;
     }
 
-    function baseTokenURI() public view returns (string memory) {
-        return _uri;
+    function setPreRevealTokenURI(string memory _tokenURI) public restricted {
+        preRevealURI  = _tokenURI;
+    }
+
+    function setReveal(bool _reveal) public restricted {
+        reveal = _reveal;
     }
 
     function setBaseTokenURI(string memory _baseURI) public restricted {
-        _uri = _baseURI;
+        uri = _baseURI;
     }
 
     function uint2str(uint256 _i) internal pure returns (string memory str) {
