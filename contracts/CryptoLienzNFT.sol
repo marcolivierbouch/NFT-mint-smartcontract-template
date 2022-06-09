@@ -11,10 +11,10 @@ contract CryptoLienzNFT is ERC721Enumerable, Ownable {
     Counters.Counter private _tokenIds;
 
     address payable public minter;
-    uint256 public maxBatch = 5;
+    uint256 public maxBatch = 100;
     uint256 public maxMintcount = 5;
     uint256 public totalCount = 200;
-    uint256 public price = 0.06 ether; //60000000000000000; // 0.06 eth
+    uint256 public price = 0 ether; //60000000000000000; // 0.06 eth
 
     mapping (address => bool) public allowList;
     mapping(address => bool) public mintlist;
