@@ -12,7 +12,6 @@ contract CryptoLienzNFT is ERC721Enumerable, Ownable {
 
     address payable public minter;
     uint256 public maxBatch = 100;
-    uint256 public maxMintcount = 5;
     uint256 public totalCount = 200;
     uint256 public price = 0 ether; //60000000000000000; // 0.06 eth
 
@@ -49,6 +48,17 @@ contract CryptoLienzNFT is ERC721Enumerable, Ownable {
         
         mintlist[msg.sender] = true;
 
+        for(uint256 i = 0; i < _times; i++){
+            _tokenIds.increment();
+
+            uint256 newItemId = _tokenIds.current();
+            _mint(msg.sender, newItemId);
+
+            emit MintNFT(msg.sender, newItemId);
+        }
+    }
+
+    function devMintNFT(uint256 _times) public restricted {
         for(uint256 i = 0; i < _times; i++){
             _tokenIds.increment();
 
