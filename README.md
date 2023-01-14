@@ -18,9 +18,6 @@ Get your ETH on the Goerli testnet (https://goerlifaucet.com/)
 
 ## Third step
 
-Get your ETH on rinkeby network
-(https://www.alchemy.com/overviews/rinkeby-testnet#how-to-get-rinkeby-testnet-eth-2)
-
 And create your alchemy key
 
 ## Fourth step
@@ -44,6 +41,7 @@ truffle migrate --network=goerli
 
 First you need to make the code flat
 ```
+npm install truffle-flattener -g
 truffle-flattener ./contracts/CryptoLienzNFT.sol > flat.sol
 ```
 
