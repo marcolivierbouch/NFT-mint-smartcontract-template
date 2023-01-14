@@ -38,7 +38,7 @@ module.exports = {
     goerli: {
       // export NODE_OPTIONS=--openssl-legacy-provider
       provider: function () {
-          return new HDWalletProvider("key here", "", 0)
+          return new HDWalletProvider("key here", "alchemy link here", 0)
       },
       network_id: '5',
       gas: 4500000,
